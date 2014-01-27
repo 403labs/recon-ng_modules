@@ -21,7 +21,7 @@ import framework
 import ssl
 from M2Crypto import X509
 
-class Module(framework.module):
+class Module(framework.Framework):
 
     def __init__(self, params):
         framework.module.__init__(self, params)

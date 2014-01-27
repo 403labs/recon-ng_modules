@@ -68,5 +68,5 @@ This is a rewrite of the built-in DNS brute forcing module to add multi-threadin
 ### Installation
 
 1. Clone this repo
-2. `mkdir ~/.recon-ng/modules/recon/hosts/gather/dns/`
+2. `mkdir -p ~/.recon-ng/modules/recon/hosts/gather/dns/`
 3. `cp recon-ng_modules/brute_force_threaded.py ~/.recon-ng/modules/recon/hosts/gather/dns/` or `ln -s recon-ng_modules/brute_force_threaded.py ~/.recon-ng/modules/recon/hosts/gather/dns/`

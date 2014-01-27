@@ -1,3 +1,21 @@
+# brute_force_threaded.py - a Recon-ng module
+# Author: Zach Grace (ztgrace) zgrace@403labs.com
+# Copyright (c) 2013 403 Labs, LLC <http://www.403labs.com>
+# License: GPLv3
+#
+# brute_force_threaded.py is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# brute_force_threaded.py is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# See <http://www.gnu.org/licenses/> for a copy of the GNU General
+# Public License
+
 import framework
 # unique to module
 import dns.resolver
@@ -57,7 +75,7 @@ class DNSBrute(threading.Thread):
                 attempt = self.max_attempts
             
 
-class Module(framework.module):
+class Module(framework.Framework):
 
     def __init__(self, params):
         framework.module.__init__(self, params)
