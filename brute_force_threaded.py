@@ -1,21 +1,3 @@
-# brute_force_threaded.py - a Recon-ng module
-# Author: Zach Grace (ztgrace) zgrace@403labs.com
-# Copyright (c) 2013 403 Labs, LLC <http://www.403labs.com>
-# License: GPLv3
-#
-# brute_force_threaded.py is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# brute_force_threaded.py is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# See <http://www.gnu.org/licenses/> for a copy of the GNU General
-# Public License
-
 import framework
 # unique to module
 import dns.resolver
@@ -42,8 +24,8 @@ class DNSBrute(threading.Thread):
             attempt = 0
             while attempt < self.max_attempts:
                 host = '%s.%s' % (word, self.domain)
-                if self.framework.goptions['debug']['value']: self.framework.output("Checking host: %s" % host)
-                if self.framework.goptions['debug']['value']: self.framework.output("wordQ length: %s" % self.wordQ.qsize())
+                if self.framework.global_options['debug']: self.framework.output("Checking host: %s" % host)
+                if self.framework.global_options['debug']: self.framework.output("wordQ length: %s" % self.wordQ.qsize())
                 try:
                     answers = self.resolver.query(host)
                 except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
@@ -78,8 +60,8 @@ class DNSBrute(threading.Thread):
 class Module(framework.Framework):
 
     def __init__(self, params):
-        framework.module.__init__(self, params)
-        self.register_option('domain', self.goptions['domain']['value'], 'yes', self.goptions['domain']['desc'])
+        framework.Framework.__init__(self, params)
+        self.register_option('domain', self.global_options['domain'], 'yes', self.global_options['domain'])
         self.register_option('wordlist', './data/hostnames.txt', 'yes', 'path to hostname wordlist')
         self.register_option('nameserver', '8.8.8.8', 'yes', 'ip address of a valid nameserver')
         self.register_option('attempts', 3, 'yes', 'Number of retry attempts per host')
@@ -92,11 +74,11 @@ class Module(framework.Framework):
                      }
 
     def module_run(self):
-        domain = self.options['domain']['value']
-        wordlist = self.options['wordlist']['value']
-        max_attempts = self.options['attempts']['value']
+        domain = self.options['domain']
+        wordlist = self.options['wordlist']
+        max_attempts = self.options['attempts']
         resolver = dns.resolver.get_default_resolver()
-        resolver.nameservers = [self.options['nameserver']['value']]
+        resolver.nameservers = [self.options['nameserver']]
         resolver.lifetime = 3
         resolver.timeout = 2
         fake_host = 'sudhfydgssjdue.%s' % (domain)
@@ -123,7 +105,7 @@ class Module(framework.Framework):
 
             # Start up the threads
             threads = []
-            for i in range(self.options['threads']['value']):
+            for i in range(self.options['threads']):
                 t = DNSBrute(self, wordQ, foundQ, newQ, domain, resolver, max_attempts)
                 threads.append(t)
                 t.setDaemon(True)

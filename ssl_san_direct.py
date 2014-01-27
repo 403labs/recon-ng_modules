@@ -24,7 +24,7 @@ from M2Crypto import X509
 class Module(framework.Framework):
 
     def __init__(self, params):
-        framework.module.__init__(self, params)
+        framework.Framework.__init__(self, params)
         self.register_option('domain', None, 'yes', 'The host to check for subject alternative names (SAN)')
         self.register_option('port', 443, 'yes', 'The port to grab the SSL cert.')
         self.info = {
@@ -35,8 +35,8 @@ class Module(framework.Framework):
                      }
 
     def module_run(self):
-        domain = self.options['domain']['value']
-        port = self.options['port']['value']
+        domain = self.options['domain']
+        port = self.options['port']
         try:
             cert = ssl.get_server_certificate((domain, port))
         except:
@@ -44,7 +44,7 @@ class Module(framework.Framework):
             return
 
         # fix the cert format for M2Crypto
-        cert = cert.replace(ssl.PEM_FOOTER,'\n%s' % ssl.PEM_FOOTER)
+        #cert = cert.replace(ssl.PEM_FOOTER,'\n%s' % ssl.PEM_FOOTER)
         x509 = X509.load_cert_string(cert)
         sans = x509.get_ext('subjectAltName').get_value()
         sans = sans.replace('DNS:', '')
