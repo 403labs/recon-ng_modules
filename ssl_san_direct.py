@@ -16,15 +16,15 @@
 # See <http://www.gnu.org/licenses/> for a copy of the GNU General
 # Public License
 
-import framework
+import module
 # unique to module
 import ssl
 from M2Crypto import X509
 
-class Module(framework.Framework):
+class Module(module.Module):
 
     def __init__(self, params):
-        framework.Framework.__init__(self, params)
+        module.Module.__init__(self, params)
         self.register_option('domain', None, 'yes', 'The host to check for subject alternative names (SAN)')
         self.register_option('port', 443, 'yes', 'The port to grab the SSL cert.')
         self.info = {

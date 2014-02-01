@@ -1,4 +1,4 @@
-import framework
+import module
 # unique to module
 import dns.resolver
 import os.path
@@ -6,9 +6,9 @@ import threading
 import Queue
 
 class DNSBrute(threading.Thread):
-    def __init__(self, framework, wordQ, foundQ, newQ, domain, resolver, max_attempts):
+    def __init__(self, module, wordQ, foundQ, newQ, domain, resolver, max_attempts):
         threading.Thread.__init__(self)
-        self.framework = framework
+        self.module = module
         self.wordQ = wordQ
         self.foundQ = foundQ
         self.newQ = newQ
@@ -24,14 +24,14 @@ class DNSBrute(threading.Thread):
             attempt = 0
             while attempt < self.max_attempts:
                 host = '%s.%s' % (word, self.domain)
-                if self.framework.global_options['debug']: self.framework.output("Checking host: %s" % host)
-                if self.framework.global_options['debug']: self.framework.output("wordQ length: %s" % self.wordQ.qsize())
+                if self.module.global_options['debug']: self.module.output("Checking host: %s" % host)
+                if self.module.global_options['debug']: self.module.output("wordQ length: %s" % self.wordQ.qsize())
                 try:
                     answers = self.resolver.query(host)
                 except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
-                    self.framework.verbose('%s => Not a host.' % (host))
+                    self.module.verbose('%s => Not a host.' % (host))
                 except dns.resolver.Timeout:
-                    self.framework.verbose('%s => Request timed out.' % (host))
+                    self.module.verbose('%s => Request timed out.' % (host))
                     attempt += 1
                     continue
                 else:
@@ -39,28 +39,28 @@ class DNSBrute(threading.Thread):
                     for answer in answers.response.answer:
                         for rdata in answer:
                             if rdata.rdtype == 1:
-                                self.framework.alert('%s => (A) %s - Host found!' % (host, host))
-                                if self.framework.add_host(host):
+                                self.module.alert('%s => (A) %s - Host found!' % (host, host))
+                                if self.module.add_host(host):
                                     self.newQ.put(host)
                                 self.foundQ.put(host)
                             if rdata.rdtype == 5:
                                 cname = rdata.target.to_text()[:-1]
-                                self.framework.alert('%s => (CNAME) %s - Host found!' % (host, cname))
+                                self.module.alert('%s => (CNAME) %s - Host found!' % (host, cname))
                                 if host != cname:
-                                    if self.framework.add_host(cname):
+                                    if self.module.add_host(cname):
                                         self.newQ.put(cname)
                                     self.foundQ.put(cname)
-                                if self.framework.add_host(host):
+                                if self.module.add_host(host):
                                     self.newQ.put(host)
                                 self.foundQ.put(host)
                 # break out of the loop
                 attempt = self.max_attempts
             
 
-class Module(framework.Framework):
+class Module(module.Module):
 
     def __init__(self, params):
-        framework.Framework.__init__(self, params)
+        module.Module.__init__(self, params)
         self.register_option('domain', self.global_options['domain'], 'yes', self.global_options['domain'])
         self.register_option('wordlist', './data/hostnames.txt', 'yes', 'path to hostname wordlist')
         self.register_option('nameserver', '8.8.8.8', 'yes', 'ip address of a valid nameserver')
